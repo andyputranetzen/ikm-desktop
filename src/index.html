@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kalkulator IKM / SKM – 16 Item Pertanyaan</title>
+<script src="xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box}
+:root{--ac:#9b1b30;--b1:#161a2a;--b2:#2b1521;--tx:#eef0f6;--mu:#a9afc4;--gl:rgba(255,255,255,.07);--bd:rgba(255,255,255,.15);--th:rgba(255,255,255,.08);--in:rgba(255,255,255,.08)}
+[data-theme=light]{--b1:#e9eef9;--b2:#fbecf0;--tx:#1c2333;--mu:#5d667d;--gl:rgba(255,255,255,.6);--bd:rgba(255,255,255,.95);--th:rgba(0,0,0,.05);--in:rgba(255,255,255,.8)}
+body{margin:0;min-height:100vh;font:14px/1.5 "Segoe UI",system-ui,sans-serif;color:var(--tx);background:radial-gradient(900px 500px at 8% -10%,color-mix(in srgb,var(--ac) 45%,transparent),transparent),radial-gradient(700px 500px at 100% 10%,color-mix(in srgb,var(--ac) 25%,#3a6ff0),transparent),linear-gradient(160deg,var(--b1),var(--b2));background-attachment:fixed}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:18px 28px}header h1{margin:0;font-size:21px;letter-spacing:.2px}header p{margin:2px 0 0;color:var(--mu);font-size:12.5px;max-width:720px}
+.tools{display:flex;align-items:center;gap:8px}#acs i{display:inline-block;width:18px;height:18px;border-radius:50%;margin-left:6px;cursor:pointer;border:2px solid var(--bd)}
+main{max-width:1200px;margin:0 auto;padding:0 18px 24px}
+.card{background:var(--gl);border:1px solid var(--bd);border-radius:18px;padding:18px;margin-bottom:14px;backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);box-shadow:0 8px 30px #0003}
+h2{margin:0 0 10px;font-size:16px}h3{margin:14px 0 6px;font-size:14px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:end}label{font-size:12px;color:var(--mu);display:block;margin-bottom:3px}
+input[type=text],input[type=number]{padding:8px 11px;border:1px solid var(--bd);background:var(--in);color:var(--tx);border-radius:10px;font:inherit;min-width:220px;outline:0}input:focus{border-color:var(--ac)}
+button,.btn{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:8px 16px;font:inherit;cursor:pointer;box-shadow:0 2px 10px #0003}button:hover{filter:brightness(1.12)}button.sec{background:var(--th);color:var(--tx);border:1px solid var(--bd);box-shadow:none}
+#drop{border:2px dashed var(--bd);border-radius:16px;padding:30px;text-align:center;color:var(--mu);cursor:pointer;background:var(--th);transition:.2s}#drop.on,#drop:hover{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 14%,transparent)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:10px}.kpi{background:var(--th);border:1px solid var(--bd);border-radius:14px;padding:12px}.kpi small{color:var(--mu);display:block}.kpi b{font-size:27px}.kpi span{font-size:12px;color:var(--mu)}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{border-bottom:1px solid var(--bd);padding:6px 8px;text-align:right}th{background:var(--th);font-weight:600}td:first-child,th:first-child,td.l,th.l{text-align:left}
+.wrap{overflow-x:auto;border-radius:12px}.m{display:inline-block;min-width:24px;text-align:center;border-radius:6px;color:#fff;font-weight:700;padding:0 7px}
+.mA{background:#1f9d55}.mB{background:#2f7fd1}.mC{background:#e0a100}.mD{background:#d03b3b}
+.bar{background:var(--th);border-radius:6px;height:10px;min-width:90px}.bar i{display:block;height:10px;border-radius:6px;background:var(--ac)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.warn{background:rgba(224,161,0,.15);border:1px solid rgba(224,161,0,.45);border-radius:10px;padding:8px 11px;margin-top:8px;font-size:13px}.ok{color:#2fc275}.bad{color:#ef5b4d}.note{font-size:12px;color:var(--mu)}.hide{display:none}
+@media print{:root,[data-theme=light]{--tx:#000;--mu:#444;--gl:#fff;--bd:#bbb;--th:#eee}body{background:#fff}.card{backdrop-filter:none;box-shadow:none}.noprint,#inp,.tools{display:none!important}}
+</style></head><body>
+<header><h1>Kalkulator Indeks Kepuasan Masyarakat (IKM)</h1><p>Survei Kepuasan Masyarakat – 16 item pertanyaan, 9 unsur pelayanan (Permenpan RB). Semua perhitungan dilakukan di browser; data tidak diunggah ke mana pun.</p><div class="tools noprint"><button class="sec" id="th">◐ Tema</button><span id="acs"></span></div></header>
+<main>
+<div class="card" id="inp">
+ <h2>1. Identitas & Data</h2>
+ <div class="row"><div><label>Nama Satuan Kerja</label><input type="text" id="satker" value="KPU Kota Bitung"></div><div><label>Periode</label><input type="text" id="periode" placeholder="mis. Triwulan I 2026"></div></div>
+ <div id="drop" style="margin-top:12px">Klik atau seret file <b>.xlsx / .xls / .csv</b> ke sini<br><span class="note">Mendukung hasil Google Form (kolom “1. …” s.d. “16. …”) maupun template “Pengolahan Data OPP 16 Pertanyaan” (kolom P1–P16)</span><input type="file" id="file" accept=".xlsx,.xls,.csv" class="hide"></div>
+ <div id="msg"></div>
+</div>
+<div id="out" class="hide"></div>
+<div class="card noprint">
+ <h2>Jumlah Sampel Minimal (Krejcie-Morgan)</h2>
+ <div class="row"><div><label>Jumlah populasi (N)</label><input type="number" id="pop" min="1" placeholder="mis. 1200"></div><div id="sampel" style="padding-bottom:6px"></div></div>
+ <p class="note">n = (3,841 × N × 0,25) ÷ ((N−1) × 0,0025 + 3,841 × 0,25), dibulatkan ke atas.</p>
+</div>
+<div class="card"><h2>Rumus & Ketentuan</h2>
+<p class="note">Nilai per unsur = rata-rata nilai item penyusunnya (U1 Persyaratan: P1–P2 · U2 Prosedur: P3–P5 · U3 Waktu: P6 · U4 Biaya: P7–P9 · U5 Produk: P10 · U6 Kompetensi: P11 · U7 Perilaku: P12–P14 · U8 Aduan: P15 · U9 Sarpras: P16). IKM = rata-rata 9 nilai unsur (skala 1–4); IKM konversi = IKM × 25. Mutu: A (Sangat Baik) ≥ 3,5324 / 88,31 · B (Baik) ≥ 3,0644 / 76,61 · C (Kurang Baik) ≥ 2,60 / 65,00 · D (Tidak Baik) di bawahnya. SPKP (Survei Persepsi Kualitas Pelayanan) = P1, P2, P3, P4, P6, P7, P10, P11, P12, P15, P16; SPAK (Survei Persepsi Anti Korupsi) = P5, P8, P9, P13, P14. Baris dengan item kosong atau nilai di luar 1–4 dinyatakan tidak valid dan tidak dihitung (sama seperti kolom “Checklist” pada template).</p></div>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const U=[['Persyaratan',[0,1]],['Prosedur',[2,3,4]],['Waktu',[5]],['Biaya',[6,7,8]],['Produk',[9]],['Kompetensi',[10]],['Perilaku',[11,12,13]],['Aduan',[14]],['Sarpras',[15]]];
+const SPKP=[0,1,2,3,5,6,9,10,11,14,15],SPAK=[4,7,8,12,13];
+const QS=['Informasi pelayanan tersedia melalui media elektronik maupun nonelektronik','Kesesuaian persyaratan dengan informasi yang diberikan','Standar dan prosedur layanan diinformasikan dengan jelas','Prosedur/alur layanan mudah dipahami dan dilakukan','Layanan diberikan sesuai prosedur tanpa kecurangan','Jangka waktu layanan sesuai dengan yang diinformasikan','Biaya layanan sesuai dengan yang diinformasikan','Tidak ada pungutan liar (pungli) dalam pelayanan','Tidak ada percaloan/perantara tidak resmi','Produk layanan yang diterima sesuai dengan yang dipublikasikan','Aplikasi sistem pelayanan merespon kebutuhan dengan cepat','Fitur pada aplikasi sistem layanan mudah digunakan','Seluruh pengguna dilayani secara adil tanpa diskriminasi','Pelayanan tanpa imbalan uang, barang, atau fasilitas di luar aturan','Layanan konsultasi dan pengaduan mudah diakses','Sistem layanan online nyaman dan mudah digunakan'];
+const MN={A:'Sangat Baik',B:'Baik',C:'Kurang Baik',D:'Tidak Baik'};
+const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
+const mutu=v=>v>=3.5324?'A':v>=3.0644?'B':v>=2.6?'C':'D';
+const f=(v,d=4)=>Number(v).toLocaleString('id-ID',{minimumFractionDigits:d,maximumFractionDigits:d});
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const badge=m=>`<span class="m m${m}">${m}</span>`;
+let R=null;
+
+function calc(rs){const n=rs.length;if(!n)return null;const m=Array(16).fill(0);
+ rs.forEach(r=>r.v.forEach((x,i)=>m[i]+=x));m.forEach((x,i)=>m[i]/=n);
+ const u=U.map(([,ix])=>avg(ix.map(i=>m[i])));const ikm=avg(u);
+ return{n,m,u,ikm,k:ikm*25,mu:mutu(ikm),spkp:avg(SPKP.map(i=>m[i])),spak:avg(SPAK.map(i=>m[i]))};}
+
+function itemNo(s){if(s==null)return 0;s=String(s);let m=s.match(/^\s*P\s*(\d{1,2})\s*$/i)||s.match(/^\s*(\d{1,2})\s*[.)]/);if(!m)return 0;const n=+m[1];return n>=1&&n<=16?n:0}
+
+function parseSheet(a){
+ let hr=-1,map={};
+ for(let r=0;r<Math.min(40,a.length)&&hr<0;r++){const mp={};(a[r]||[]).forEach((c,i)=>{const n=itemNo(c);if(n&&!(n in mp))mp[n]=i});if(Object.keys(mp).length>=16){hr=r;map=mp}}
+ if(hr<0)return null;
+ const ncol=Math.max(...a.map(r=>(r||[]).length));const used=new Set(Object.values(map));
+ const txt=c=>a.slice(0,hr+1).map(r=>(r||[])[c]).filter(x=>typeof x==='string').join(' ').toLowerCase();
+ const find=(re,skip=[])=>{for(let c=0;c<ncol;c++)if(!used.has(c)&&!skip.includes(c)&&re.test(txt(c)))return c;return -1};
+ const C={};C.dk=find(/jika ya|jenis disabilitas|kategorisasi jenis/);C.ds=find(/disabilitas/,[C.dk]);
+ C.ly=find(/jenis layanan/);C.jk=find(/jenis kelamin/);C.us=find(/usia/);C.pd=find(/pendidikan/);C.pk=find(/pekerjaan/);
+ const g=(row,c)=>c<0||row[c]==null?'':String(row[c]).trim();
+ const qs=[];for(let i=1;i<=16;i++){const h=String(a[hr][map[i]]);qs.push(/^\s*P\s*\d+\s*$/i.test(h)?QS[i-1]:h.replace(/^\s*\d+\s*[.)]\s*/,'').trim())}
+ const rows=[],bad=[];
+ for(let r=hr+1;r<a.length;r++){const row=a[r]||[];
+  const fc=row.find(x=>x!=null&&x!=='');if(typeof fc==='string'&&/^\s*(total|nilai|kategori|ikm|mutu|rincian|rata)/i.test(fc))break;
+  const raw=[];for(let i=1;i<=16;i++)raw.push(row[map[i]]);
+  if(raw.every(x=>x==null||x===''))continue;
+  const v=raw.map(x=>x==null||x===''?NaN:Number(x));
+  let why='';if(v.some(isNaN))why='item kosong / bukan angka';else if(v.some(x=>x<1||x>4))why='nilai di luar 1–4';
+  if(why){bad.push({no:r+1,why});continue}
+  const ds=g(row,C.ds);const dis=/^(ya|disabilitas)/i.test(ds)||(C.ds<0&&g(row,C.dk)!=='');
+  rows.push({v,ly:g(row,C.ly),jk:g(row,C.jk),us:g(row,C.us),pd:g(row,C.pd),pk:g(row,C.pk),dis,dk:g(row,C.dk)})}
+ return{rows,bad,qs,found:C};
+}
+
+function load(file){
+ $('#msg').innerHTML='<p class="note">Membaca file…</p>';
+ const rd=new FileReader();
+ rd.onload=e=>{try{
+  const wb=XLSX.read(e.target.result,{type:'array'});let res=null,sn='';
+  for(const n of wb.SheetNames){const a=XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:null,raw:true});res=parseSheet(a);if(res){sn=n;break}}
+  if(!res)return $('#msg').innerHTML='<div class="warn bad">Kolom item pertanyaan tidak ditemukan. Pastikan header berupa “1. …” s.d. “16. …” atau P1–P16.</div>';
+  if(!res.rows.length)return $('#msg').innerHTML='<div class="warn bad">Tidak ada baris data yang valid.</div>';
+  R=res;R.file=file.name;R.sheet=sn;render();
+ }catch(err){$('#msg').innerHTML='<div class="warn bad">Gagal membaca file: '+esc(err.message)+'</div>'}};
+ rd.readAsArrayBuffer(file);
+}
+
+function grpTable(rs,keyFn,label,minN=1){
+ const g={};rs.forEach(r=>{const k=keyFn(r);if(k===null)return;(g[k]=g[k]||[]).push(r)});
+ const ks=Object.keys(g).sort();if(!ks.length)return '<p class="note">Tidak ada data.</p>';
+ const body=ks.map(k=>{const c=calc(g[k]);return `<tr><td>${esc(k)}</td><td>${c.n}</td>${c.u.map(x=>`<td>${f(x,2)}</td>`).join('')}<td><b>${f(c.ikm)}</b></td><td>${f(c.k,2)}</td><td>${badge(c.mu)}</td></tr>`}).join('');
+ return `<div class="wrap"><table><tr><th>${label}</th><th>n</th>${U.map((u,i)=>`<th title="${u[0]}">U${i+1}</th>`).join('')}<th>IKM</th><th>Konversi</th><th>Mutu</th></tr>${body}</table></div>`;
+}
+function dist(rs,key,label){
+ const g={};rs.forEach(r=>{const k=r[key]||'(kosong)';g[k]=(g[k]||0)+1});
+ const ks=Object.keys(g).sort((a,b)=>g[b]-g[a]);
+ return `<div class="wrap"><table><tr><th>${label}</th><th>Jml</th><th>%</th></tr>${ks.map(k=>`<tr><td>${esc(k)}</td><td>${g[k]}</td><td>${f(g[k]/rs.length*100,1)}%</td></tr>`).join('')}<tr><th>Total</th><th>${rs.length}</th><th>100%</th></tr></table></div>`;
+}
+
+function render(){
+ const rs=R.rows,c=calc(rs);R.c=c;
+ const sat=$('#satker').value||'-',per=$('#periode').value;
+ let h=`<div class="card"><h2>Hasil – ${esc(sat)}${per?' · '+esc(per):''}</h2>
+ <div class="kpis">
+  <div class="kpi"><small>IKM (skala 1–4)</small><b>${f(c.ikm)}</b></div>
+  <div class="kpi"><small>IKM Konversi (×25)</small><b>${f(c.k,2)}</b></div>
+  <div class="kpi"><small>Mutu Layanan</small><b>${badge(c.mu)}</b> <span>${MN[c.mu]}</span></div>
+  <div class="kpi"><small>Responden valid</small><b>${c.n}</b><span>${R.bad.length?R.bad.length+' baris tidak valid':'semua baris valid'}</span></div>
+  <div class="kpi"><small>SPKP (konversi)</small><b>${f(c.spkp*25,2)}</b><span>nilai ${f(c.spkp)} · ${badge(mutu(c.spkp))}</span></div>
+  <div class="kpi"><small>SPAK (konversi)</small><b>${f(c.spak*25,2)}</b><span>nilai ${f(c.spak)} · ${badge(mutu(c.spak))}</span></div>
+ </div>
+ <p class="note">File: ${esc(R.file)} (sheet “${esc(R.sheet)}”)</p>`;
+ if(R.bad.length)h+=`<div class="warn"><b>${R.bad.length} baris tidak dihitung:</b> ${R.bad.slice(0,15).map(b=>`baris ${b.no} (${b.why})`).join('; ')}${R.bad.length>15?' …':''}</div>`;
+ h+=`<div class="row noprint" style="margin-top:12px"><button onclick="xl()">Unduh hasil (.xlsx)</button><button class="sec" onclick="print()">Cetak / PDF</button></div></div>`;
+ h+=`<div class="card"><h2>Nilai Per Unsur Pelayanan</h2><div class="wrap"><table><tr><th>Unsur</th><th>Item</th><th>Nilai</th><th>Konversi</th><th>Mutu</th><th></th></tr>`+
+  U.map(([n,ix],i)=>`<tr><td>U${i+1} ${n}</td><td>${ix.map(x=>'P'+(x+1)).join(', ')}</td><td>${f(c.u[i])}</td><td>${f(c.u[i]*25,2)}</td><td>${badge(mutu(c.u[i]))}</td><td><div class="bar"><i style="width:${c.u[i]/4*100}%"></i></div></td></tr>`).join('')+
+  `<tr><th class="l" colspan="2">IKM (rata-rata 9 unsur)</th><th>${f(c.ikm)}</th><th>${f(c.k,2)}</th><th>${badge(c.mu)}</th><th></th></tr></table></div></div>`;
+ const tot=Array(16).fill(0);rs.forEach(r=>r.v.forEach((x,i)=>tot[i]+=x));
+ const un=i=>U.findIndex(u=>u[1].includes(i));
+ h+=`<div class="card"><h2>Rincian Per Item Pertanyaan</h2><div class="wrap"><table><tr><th>Item</th><th class="l">Unsur</th><th class="l">Pertanyaan</th><th>Total</th><th>Rata-rata</th><th>Konversi</th><th></th></tr>`+
+  c.m.map((m,i)=>`<tr><td>P${i+1}</td><td class="l">${U[un(i)][0]}</td><td class="l">${esc(R.qs[i])}</td><td>${tot[i]}</td><td>${f(m)}</td><td>${f(m*25,2)}</td><td><div class="bar"><i style="width:${m/4*100}%"></i></div></td></tr>`).join('')+`</table></div></div>`;
+ h+=`<div class="card"><h2>Nilai Per Jenis Layanan</h2>${grpTable(rs,r=>r.ly||'(kosong)','Jenis Layanan')}<p class="note">U1–U9 = nilai tiap unsur (skala 1–4).</p>
+  <h3>Kelompok Rentan</h3>${grpTable(rs,r=>r.dis?'Disabilitas':'Non Disabilitas','Kategori')}
+  <h3>Per Jenis Disabilitas</h3>${grpTable(rs,r=>r.dis?(r.dk||'(jenis tidak diisi)'):null,'Jenis Disabilitas')}</div>`;
+ h+=`<div class="card"><h2>Profil Responden</h2><div class="grid">${dist(rs,'jk','Jenis Kelamin')}${dist(rs,'us','Usia')}${dist(rs,'pd','Pendidikan')}${dist(rs,'pk','Pekerjaan')}</div></div>`;
+ $('#out').innerHTML=h;$('#out').classList.remove('hide');
+ const fd=R.found,miss=[['ly','Jenis Layanan'],['jk','Jenis Kelamin'],['pd','Pendidikan'],['pk','Pekerjaan'],['ds','Status disabilitas']].filter(x=>fd[x[0]]<0).map(x=>x[1]);
+ $('#msg').innerHTML=`<p class="ok">✔ ${c.n} responden valid terbaca.</p>`+(miss.length?`<p class="note">Kolom tidak ditemukan (tabel terkait kosong): ${miss.join(', ')}</p>`:'');
+ updSampel();
+}
+
+function xl(){
+ const c=R.c,rs=R.rows,wb=XLSX.utils.book_new();
+ const add=(n,a)=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(a),n);
+ add('Ringkasan',[['Satuan Kerja',$('#satker').value],['Periode',$('#periode').value],['Responden valid',c.n],['IKM',c.ikm],['IKM Konversi',c.k],['Mutu Layanan',c.mu+' ('+MN[c.mu]+')'],['SPKP (nilai)',c.spkp],['SPKP (konversi)',c.spkp*25],['SPAK (nilai)',c.spak],['SPAK (konversi)',c.spak*25]]);
+ add('Per Unsur',[['Unsur','Item','Nilai','Konversi','Mutu'],...U.map(([n,ix],i)=>['U'+(i+1)+' '+n,ix.map(x=>'P'+(x+1)).join(', '),c.u[i],c.u[i]*25,mutu(c.u[i])])]);
+ add('Per Item',[['Item','Pertanyaan','Rata-rata','Konversi'],...c.m.map((m,i)=>['P'+(i+1),R.qs[i],m,m*25])]);
+ const gr=(kf)=>{const g={};rs.forEach(r=>{const k=kf(r);if(k===null)return;(g[k]=g[k]||[]).push(r)});return Object.keys(g).sort().map(k=>{const x=calc(g[k]);return[k,x.n,...x.u,x.ikm,x.k,x.mu]})};
+ const hd=['Kelompok','n',...U.map((u,i)=>'U'+(i+1)),'IKM','Konversi','Mutu'];
+ add('Per Layanan',[hd,...gr(r=>r.ly||'(kosong)')]);
+ add('Kelompok Rentan',[hd,...gr(r=>r.dis?'Disabilitas':'Non Disabilitas'),...gr(r=>r.dis?(r.dk||'(jenis tidak diisi)'):null)]);
+ saveWb(wb,'Hasil_IKM_'+($('#satker').value||'satker').replace(/\W+/g,'_')+'.xlsx');
+}
+
+function updSampel(){
+ const N=+$('#pop').value;if(!N||N<1){$('#sampel').innerHTML='';return}
+ const n=3.841*N*0.25/((N-1)*0.0025+3.841*0.25),m=Math.ceil(n);
+ let t=`Sampel minimal: <b>${m}</b> responden <span class="note">(${f(n,2)})</span>`;
+ if(R)t+=` · responden valid saat ini ${R.c.n} → <b class="${R.c.n>=m?'ok':'bad'}">${R.c.n>=m?'memenuhi':'belum memenuhi'}</b>`;
+ $('#sampel').innerHTML=t;
+}
+$('#pop').addEventListener('input',updSampel);
+['satker','periode'].forEach(i=>$('#'+i).addEventListener('input',()=>R&&render()));
+const d=$('#drop');d.onclick=()=>$('#file').click();
+$('#file').onchange=e=>e.target.files[0]&&load(e.target.files[0]);
+d.ondragover=e=>{e.preventDefault();d.classList.add('on')};d.ondragleave=()=>d.classList.remove('on');
+d.ondrop=e=>{e.preventDefault();d.classList.remove('on');e.dataTransfer.files[0]&&load(e.dataTransfer.files[0])};
+
+async function saveWb(wb,name){const T=window.__TAURI__;
+ if(T&&T.dialog&&T.fs){try{const p=await T.dialog.save({defaultPath:name,filters:[{name:'Excel',extensions:['xlsx']}]});if(!p)return;
+  await T.fs.writeFile(p,new Uint8Array(XLSX.write(wb,{type:'array',bookType:'xlsx'})));alert('Tersimpan: '+p);return}catch(e){console.error(e)}}
+ XLSX.writeFile(wb,name)}
+(function(){const D=document.documentElement,S=k=>{try{return localStorage.getItem(k)}catch(e){}},W=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+ D.dataset.theme=S('th')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+ $('#th').onclick=()=>{D.dataset.theme=D.dataset.theme==='dark'?'light':'dark';W('th',D.dataset.theme)};
+ const A=['#9b1b30','#2f7fd1','#1f9d55','#8a4fd6','#e0762b','#0e9aa7'],set=c=>{D.style.setProperty('--ac',c);W('ac',c)};
+ $('#acs').innerHTML=A.map(c=>`<i style="background:${c}" data-c="${c}"></i>`).join('');
+ $('#acs').onclick=e=>e.target.dataset.c&&set(e.target.dataset.c);if(S('ac'))set(S('ac'))})();
+</script></body></html>
